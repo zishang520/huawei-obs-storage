@@ -3491,7 +3491,7 @@ class OBSRequestResource
                 ],
             ],
 
-            'appendFile' => [
+            'modifyFile' => [
                 'httpMethod' => 'PUT',
                 'specialParam' => 'modify',
                 'requestParameters' => [

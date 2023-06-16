@@ -463,11 +463,11 @@ class HuaweiObsAdapter implements FilesystemAdapter
     }
 
     /**
-     * appendFile并行桶才能有，测试没通过.
+     * modifyFile并行桶才能有，测试没通过.
      * @copyright (c) zishang520 All Rights Reserved
      * @throws UnableToWriteFile
      */
-    public function appendFile(string $path, string $file, int $position, Config $config): void
+    public function modifyFile(string $path, string $file, int $position, Config $config): void
     {
         try {
             $key = $this->prefixer->prefixPath($path);
@@ -478,7 +478,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
                 $options[ObsClient::OBS_CONTENT_TYPE] = $mimeType;
             }
 
-            $this->client->appendFile([
+            $this->client->modifyFile([
                 ObsClient::OBS_BUCKET => $this->bucket,
                 ObsClient::OBS_KEY => $key,
                 ObsClient::OBS_BODY => $file,
