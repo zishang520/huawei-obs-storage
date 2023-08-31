@@ -4,7 +4,6 @@
     "keywords": ["huawei", "obs", "laravel", "filesystems", "storage"],
     "homepage": "https://github.com/zishang520/huawei-obs-storage",
     "license": "MIT",
-    "version": "v1.0.0",
     "authors": [{
         "name": "luoyy",
         "email": "zishang520@gmail.com"
