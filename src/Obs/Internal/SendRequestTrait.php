@@ -4,7 +4,7 @@ namespace luoyy\HuaweiOBS\Obs\Internal;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
@@ -187,7 +187,7 @@ trait SendRequestTrait
         return $model;
     }
 
-    protected function makeRequest(Model $model, array &$operation, array $params, ?string $endpoint = null): Request
+    protected function makeRequest(Model $model, array &$operation, array $params, string $endpoint = null): Request
     {
         if (is_null($endpoint)) {
             $endpoint = $this->endpoint;
@@ -202,7 +202,7 @@ trait SendRequestTrait
         return new Request($httpMethod, $authResult['requestUrl'], $authResult['headers'], $authResult['body']);
     }
 
-    protected function doRequest(Model $model, array &$operation, array $params, ?string $endpoint = null): void
+    protected function doRequest(Model $model, array &$operation, array $params, string $endpoint = null): void
     {
         $request = $this->makeRequest($model, $operation, $params, $endpoint);
         $this->sendRequest($model, $operation, $params, $request);
@@ -254,7 +254,7 @@ trait SendRequestTrait
                 }
                 $this->parseResponse($model, $request, $response, $operation);
             },
-            function (RequestException $exception) use ($model, $operation, $params, $request, $requestCount) {
+            function (TransferException $exception) use ($model, $operation, $params, $request, $requestCount) {
                 $message = null;
                 if ($exception instanceof ConnectException) {
                     if ($requestCount <= $this->maxRetryCount) {
@@ -269,7 +269,7 @@ trait SendRequestTrait
         $promise->wait();
     }
 
-    protected function doRequestAsync(Model $model, array &$operation, array $params, callable $callback, int $startAsync, $originMethod, ?string $endpoint = null): PromiseInterface
+    protected function doRequestAsync(Model $model, array &$operation, array $params, callable $callback, int $startAsync, $originMethod, string $endpoint = null): PromiseInterface
     {
         $request = $this->makeRequest($model, $operation, $params, $endpoint);
         return $this->sendRequestAsync($model, $operation, $params, $callback, $startAsync, $originMethod, $request);
@@ -318,7 +318,7 @@ trait SendRequestTrait
                 unset($model['method']);
                 $callback(null, $model);
             },
-            function (RequestException $exception) use ($model, $operation, $params, $callback, $startAsync, $originMethod, $request, $requestCount) {
+            function (TransferException $exception) use ($model, $operation, $params, $callback, $startAsync, $originMethod, $request, $requestCount) {
                 $message = null;
                 if ($exception instanceof ConnectException) {
                     if ($requestCount <= $this->maxRetryCount) {
