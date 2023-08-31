@@ -29,17 +29,17 @@ class ObsException extends \RuntimeException
 
     private Request $request;
 
-    private string $requestId;
+    private string $requestId = '';
 
-    private string $exceptionType;
+    private string $exceptionType = '';
 
-    private string $exceptionCode;
+    private string $exceptionCode = '';
 
     private string $exceptionMessage = '';
 
-    private string $hostId;
+    private string $hostId = '';
 
-    public function __construct(?string $message = null, ?int $code = null, ?\Throwable $previous = null)
+    public function __construct(string $message = null, int $code = null, \Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
