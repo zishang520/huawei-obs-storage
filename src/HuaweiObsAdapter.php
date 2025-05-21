@@ -97,7 +97,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
         string $prefix = '',
         ?VisibilityConverter $visibility = null,
         ?MimeTypeDetector $mimeTypeDetector = null,
-        array $options = []
+        array $options = [],
     ) {
         $this->client = $client;
         $this->bucket = $bucket;
@@ -155,7 +155,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
             ];
             $listObjectInfo = $this->client->listObjects($options + $this->options);
 
-            return !empty($listObjectInfo->Contents) || !empty($listObjectInfo->CommonPrefixes);
+            return ! empty($listObjectInfo->Contents) || ! empty($listObjectInfo->CommonPrefixes);
         } catch (\Throwable $exception) {
             throw UnableToCheckDirectoryExistence::forLocation($path, $exception);
         }
@@ -338,7 +338,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
             throw UnableToRetrieveMetadata::visibility($path, '', $exception);
         }
 
-        $visibility = $this->visibility->aclToVisibility(!empty(Arr::where($acl->Grants, fn ($item) => strtolower(Arr::get($item, 'Grantee.URI', '')) === 'everyone' && strtolower(Arr::get($item, 'Permission', '')) === 'read')) ? 'READ' : 'PRIVATE');
+        $visibility = $this->visibility->aclToVisibility(! empty(Arr::where($acl->Grants, fn($item) => strtolower(Arr::get($item, 'Grantee.URI', '')) === 'everyone' && strtolower(Arr::get($item, 'Permission', '')) === 'read')) ? 'READ' : 'PRIVATE');
 
         return new FileAttributes(path: $path, visibility: $visibility);
     }
@@ -472,7 +472,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
         try {
             $key = $this->prefixer->prefixPath($path);
             $options = $this->getOptions($this->options, $config);
-            $shouldDetermineMimetype = $file !== '' && !array_key_exists(ObsClient::OBS_CONTENT_TYPE, $options);
+            $shouldDetermineMimetype = $file !== '' && ! array_key_exists(ObsClient::OBS_CONTENT_TYPE, $options);
 
             if ($shouldDetermineMimetype && $mimeType = $this->mimeTypeDetector->detectMimeType($key, $file)) {
                 $options[ObsClient::OBS_CONTENT_TYPE] = $mimeType;
@@ -551,11 +551,11 @@ class HuaweiObsAdapter implements FilesystemAdapter
     /**
      * Get options for a OBS call. done.
      */
-    protected function getOptions(array $options = [], Config $config = null): array
+    protected function getOptions(array $options = [], ?Config $config = null): array
     {
         $options = array_merge($this->options, $options);
 
-        if (!is_null($config)) {
+        if (! is_null($config)) {
             $options = array_merge($options, $this->getOptionsFromConfig($config));
         }
 
@@ -670,7 +670,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
 
         $attributes = $this->mapObsObjectMetadata($objectMeta->toArray(), $path);
 
-        if (!$attributes instanceof FileAttributes) {
+        if (! $attributes instanceof FileAttributes) {
             throw UnableToRetrieveMetadata::create($path, $type, '');
         }
 
@@ -680,7 +680,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
     /**
      * @copyright (c) zishang520 All Rights Reserved
      */
-    private function mapObsObjectMetadata(array $metadata, string $path = null): StorageAttributes
+    private function mapObsObjectMetadata(array $metadata, ?string $path = null): StorageAttributes
     {
         if ($path === null) {
             $path = $this->prefixer->stripPrefix($metadata['Key'] ?? $metadata['Prefix']);
@@ -696,7 +696,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
         $fileSize = $metadata['ContentLength'] ?? null;
         $fileSize = $fileSize === null ? null : (int) $fileSize;
         $dateTime = $metadata['LastModified'] ?? null;
-        $lastModified = !is_null($dateTime) ? Carbon::parse($dateTime)->getTimeStamp() : null;
+        $lastModified = ! is_null($dateTime) ? Carbon::parse($dateTime)->getTimeStamp() : null;
 
         return new FileAttributes(
             path: $path,
@@ -732,7 +732,7 @@ class HuaweiObsAdapter implements FilesystemAdapter
         $key = $this->prefixer->prefixPath($path);
         $options = $this->getOptions($this->options, $config);
 
-        $shouldDetermineMimetype = $body !== '' && !array_key_exists(ObsClient::OBS_CONTENT_TYPE, $options);
+        $shouldDetermineMimetype = $body !== '' && ! array_key_exists(ObsClient::OBS_CONTENT_TYPE, $options);
 
         if ($shouldDetermineMimetype && $mimeType = $this->mimeTypeDetector->detectMimeType($key, $body)) {
             $options[ObsClient::OBS_CONTENT_TYPE] = $mimeType;

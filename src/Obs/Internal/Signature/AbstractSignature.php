@@ -62,7 +62,7 @@ abstract class AbstractSignature implements SignatureInterface
         $buffer = [];
         for ($index = 0; $index < $len; ++$index) {
             $str = $val[$index];
-            $buffer[] = !($pos = strpos($safe, $str)) && $pos !== 0 ? rawurlencode($str) : $str;
+            $buffer[] = ! ($pos = strpos($safe, $str)) && $pos !== 0 ? rawurlencode($str) : $str;
         }
         return implode('', $buffer);
     }
@@ -82,8 +82,8 @@ abstract class AbstractSignature implements SignatureInterface
                         $subXml[] = $temp;
                     }
                 }
-                if (!empty($subXml)) {
-                    if (!isset($value['data']['xmlFlattened'])) {
+                if (! empty($subXml)) {
+                    if (! isset($value['data']['xmlFlattened'])) {
                         $xml[] = '<' . $name . '>';
                         $xml[] = implode('', $subXml);
                         $xml[] = '</' . $name . '>';
@@ -97,7 +97,7 @@ abstract class AbstractSignature implements SignatureInterface
                 $subXml = [];
                 $attr = [];
                 foreach ($properties as $pkey => $pvalue) {
-                    if (isset($pvalue['required']) && $pvalue['required'] && !isset($subParams[$pkey])) {
+                    if (isset($pvalue['required']) && $pvalue['required'] && ! isset($subParams[$pkey])) {
                         $obsException = new ObsException('param:' . $pkey . ' is required');
                         $obsException->setExceptionType('client');
                         throw $obsException;
@@ -118,12 +118,12 @@ abstract class AbstractSignature implements SignatureInterface
                 $val = implode('', $subXml);
                 if ($val !== '') {
                     $_name = $name;
-                    if (!empty($attr)) {
+                    if (! empty($attr)) {
                         foreach ($attr as $akey => $avalue) {
                             $_name .= ' ' . $akey . '=' . $avalue;
                         }
                     }
-                    if (!isset($value['data']['xmlFlattened'])) {
+                    if (! isset($value['data']['xmlFlattened'])) {
                         $xml[] = '<' . $_name . '>';
                         $xml[] = $val;
                         $xml[] = '</' . $name . '>';
@@ -141,25 +141,25 @@ abstract class AbstractSignature implements SignatureInterface
 
         if ($treatAsString) {
             if ($type === 'boolean') {
-                if (!is_bool($subParams) && ((string) $subParams) !== 'false' && ((string) $subParams) !== 'true') {
+                if (! is_bool($subParams) && ((string) $subParams) !== 'false' && ((string) $subParams) !== 'true') {
                     $obsException = new ObsException('param:' . $key . ' is not a boolean value');
                     $obsException->setExceptionType('client');
                     throw $obsException;
                 }
             } elseif ($type === 'numeric') {
-                if (!is_numeric($subParams)) {
+                if (! is_numeric($subParams)) {
                     $obsException = new ObsException('param:' . $key . ' is not a numeric value');
                     $obsException->setExceptionType('client');
                     throw $obsException;
                 }
             } elseif ($type === 'float') {
-                if (!is_float($subParams)) {
+                if (! is_float($subParams)) {
                     $obsException = new ObsException('param:' . $key . ' is not a float value');
                     $obsException->setExceptionType('client');
                     throw $obsException;
                 }
             } elseif ($type === 'int' || $type === 'integer') {
-                if (!is_int($subParams)) {
+                if (! is_int($subParams)) {
                     $obsException = new ObsException('param:' . $key . ' is not a int value');
                     $obsException->setExceptionType('client');
                     throw $obsException;
@@ -180,7 +180,7 @@ abstract class AbstractSignature implements SignatureInterface
             }
             if (isset($val) && $val !== '') {
                 $val = $this->xml_tansfer($val);
-                if (!isset($value['data']['xmlFlattened'])) {
+                if (! isset($value['data']['xmlFlattened'])) {
                     $xml[] = '<' . $name . '>';
                     $xml[] = $val;
                     $xml[] = '</' . $name . '>';
@@ -231,7 +231,7 @@ abstract class AbstractSignature implements SignatureInterface
         if (isset($requestConfig['requestParameters'])) {
             $paramsMetadata = $requestConfig['requestParameters'];
             foreach ($paramsMetadata as $key => $value) {
-                if (isset($value['required']) && $value['required'] && !isset($params[$key])) {
+                if (isset($value['required']) && $value['required'] && ! isset($params[$key])) {
                     $obsException = new ObsException('param:' . $key . ' is required');
                     $obsException->setExceptionType('client');
                     throw $obsException;
@@ -243,25 +243,25 @@ abstract class AbstractSignature implements SignatureInterface
                     if ($val !== '' && isset($value['type'])) {
                         $type = $value['type'];
                         if ($type === 'boolean') {
-                            if (!is_bool($val) && ((string) $val) !== 'false' && ((string) $val) !== 'true') {
+                            if (! is_bool($val) && ((string) $val) !== 'false' && ((string) $val) !== 'true') {
                                 $obsException = new ObsException('param:' . $key . ' is not a boolean value');
                                 $obsException->setExceptionType('client');
                                 throw $obsException;
                             }
                         } elseif ($type === 'numeric') {
-                            if (!is_numeric($val)) {
+                            if (! is_numeric($val)) {
                                 $obsException = new ObsException('param:' . $key . ' is not a numeric value');
                                 $obsException->setExceptionType('client');
                                 throw $obsException;
                             }
                         } elseif ($type === 'float') {
-                            if (!is_float($val)) {
+                            if (! is_float($val)) {
                                 $obsException = new ObsException('param:' . $key . ' is not a float value');
                                 $obsException->setExceptionType('client');
                                 throw $obsException;
                             }
                         } elseif ($type === 'int' || $type === 'integer') {
-                            if (!is_int($val)) {
+                            if (! is_int($val)) {
                                 $obsException = new ObsException('param:' . $key . ' is not a int value');
                                 $obsException->setExceptionType('client');
                                 throw $obsException;
@@ -345,7 +345,7 @@ abstract class AbstractSignature implements SignatureInterface
                         }
 
                         if ($type === 'file') {
-                            if (!file_exists($val)) {
+                            if (! file_exists($val)) {
                                 $obsException = new ObsException('file[' . $val . '] does not exist');
                                 $obsException->setExceptionType('client');
                                 throw $obsException;
@@ -357,7 +357,7 @@ abstract class AbstractSignature implements SignatureInterface
                         } elseif ($type === 'json') {
                             // TODO
                             $jsonData = json_encode($val);
-                            if (!$jsonData) {
+                            if (! $jsonData) {
                                 $obsException = new ObsException('input is invalid, since it is not json data');
                                 $obsException->setExceptionType('client');
                                 throw $obsException;
@@ -385,7 +385,7 @@ abstract class AbstractSignature implements SignatureInterface
                 $requestUrl = $requestUrl . '/' . $uriParam;
             }
 
-            if (!empty($pathArgs)) {
+            if (! empty($pathArgs)) {
                 $requestUrl .= '?';
                 $_pathArgs = [];
                 foreach ($pathArgs as $key => $value) {
@@ -440,7 +440,7 @@ abstract class AbstractSignature implements SignatureInterface
             }
         }
 
-        if (!is_null($this->securityToken)) {
+        if (! is_null($this->securityToken)) {
             $headers[OBSConstants::SECURITY_TOKEN_HEAD] = $this->securityToken;
         }
 

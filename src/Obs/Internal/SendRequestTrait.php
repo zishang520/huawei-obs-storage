@@ -69,14 +69,14 @@ trait SendRequestTrait
 
         $operation = $resource['operations'][$method] ?? null;
 
-        if (!$operation) {
+        if (! $operation) {
             $obsException = new ObsException('unknow method ' . $originMethod);
             $obsException->setExceptionType('client');
             throw $obsException;
         }
 
         $start = microtime(true);
-        if (!$async) {
+        if (! $async) {
             $model = new Model();
             $model->method = $method;
             $params = empty($args) ? [] : $args[0];
@@ -85,7 +85,7 @@ trait SendRequestTrait
             unset($model->method);
             return $model;
         }
-        if (empty($args) || !is_callable($callback = $args[count($args) - 1])) {
+        if (empty($args) || ! is_callable($callback = $args[count($args) - 1])) {
             $obsException = new ObsException('async method ' . $originMethod . ' must pass a CallbackInterface as param');
             $obsException->setExceptionType('client');
             throw $obsException;
@@ -116,7 +116,7 @@ trait SendRequestTrait
             }
         }
 
-        if (!is_null($this->securityToken) && !isset($formParams[OBSConstants::SECURITY_TOKEN_HEAD])) {
+        if (! is_null($this->securityToken) && ! isset($formParams[OBSConstants::SECURITY_TOKEN_HEAD])) {
             $formParams[OBSConstants::SECURITY_TOKEN_HEAD] = $this->securityToken;
         }
 
@@ -152,7 +152,7 @@ trait SendRequestTrait
                     $matchAnyKey = false;
                 }
 
-                if (!in_array($key, Constants::ALLOWED_REQUEST_HTTP_HEADER_METADATA_NAMES) && strpos($key, OBSConstants::HEADER_PREFIX) !== 0 && !in_array($key, $conditionAllowKeys)) {
+                if (! in_array($key, Constants::ALLOWED_REQUEST_HTTP_HEADER_METADATA_NAMES) && strpos($key, OBSConstants::HEADER_PREFIX) !== 0 && ! in_array($key, $conditionAllowKeys)) {
                     $key = OBSConstants::METADATA_PREFIX . $key;
                 }
 
@@ -187,7 +187,7 @@ trait SendRequestTrait
         return $model;
     }
 
-    protected function makeRequest(Model $model, array &$operation, array $params, string $endpoint = null): Request
+    protected function makeRequest(Model $model, array &$operation, array $params, ?string $endpoint = null): Request
     {
         if (is_null($endpoint)) {
             $endpoint = $this->endpoint;
@@ -202,7 +202,7 @@ trait SendRequestTrait
         return new Request($httpMethod, $authResult['requestUrl'], $authResult['headers'], $authResult['body']);
     }
 
-    protected function doRequest(Model $model, array &$operation, array $params, string $endpoint = null): void
+    protected function doRequest(Model $model, array &$operation, array $params, ?string $endpoint = null): void
     {
         $request = $this->makeRequest($model, $operation, $params, $endpoint);
         $this->sendRequest($model, $operation, $params, $request);
@@ -242,7 +242,7 @@ trait SendRequestTrait
             function (Response $response) use ($model, $operation, $params, $request, $requestCount) {
                 $statusCode = $response->getStatusCode();
                 $readable = isset($params[ObsClient::OBS_BODY]) && ($params[ObsClient::OBS_BODY] instanceof StreamInterface || is_resource($params[ObsClient::OBS_BODY]));
-                if ($statusCode >= 300 && $statusCode < 400 && $statusCode !== 304 && !$readable && $requestCount <= $this->maxRetryCount) {
+                if ($statusCode >= 300 && $statusCode < 400 && $statusCode !== 304 && ! $readable && $requestCount <= $this->maxRetryCount) {
                     if ($location = $response->getHeaderLine('location')) {
                         $url = parse_url($this->endpoint);
                         $newUrl = parse_url($location);
@@ -269,7 +269,7 @@ trait SendRequestTrait
         $promise->wait();
     }
 
-    protected function doRequestAsync(Model $model, array &$operation, array $params, callable $callback, int $startAsync, $originMethod, string $endpoint = null): PromiseInterface
+    protected function doRequestAsync(Model $model, array &$operation, array $params, callable $callback, int $startAsync, $originMethod, ?string $endpoint = null): PromiseInterface
     {
         $request = $this->makeRequest($model, $operation, $params, $endpoint);
         return $this->sendRequestAsync($model, $operation, $params, $callback, $startAsync, $originMethod, $request);
@@ -304,7 +304,7 @@ trait SendRequestTrait
             function (Response $response) use ($model, $operation, $params, $callback, $startAsync, $originMethod, $request) {
                 $statusCode = $response->getStatusCode();
                 $readable = isset($params[ObsClient::OBS_BODY]) && ($params[ObsClient::OBS_BODY] instanceof StreamInterface || is_resource($params[ObsClient::OBS_BODY]));
-                if ($statusCode === 307 && !$readable) {
+                if ($statusCode === 307 && ! $readable) {
                     if ($location = $response->getHeaderLine('location')) {
                         $url = parse_url($this->endpoint);
                         $newUrl = parse_url($location);
@@ -334,7 +334,7 @@ trait SendRequestTrait
 
     private function createCommonSignedUrl(array $args = [])
     {
-        if (!isset($args[ObsClient::OBS_METHOD])) {
+        if (! isset($args[ObsClient::OBS_METHOD])) {
             $obsException = new ObsException('Method param must be specified, allowed values: GET | PUT | HEAD | POST | DELETE | OPTIONS');
             $obsException->setExceptionType('client');
             throw $obsException;
@@ -363,7 +363,7 @@ trait SendRequestTrait
             }
         }
 
-        if (!is_null($this->securityToken) && !isset($queryParams[OBSConstants::SECURITY_TOKEN_HEAD])) {
+        if (! is_null($this->securityToken) && ! isset($queryParams[OBSConstants::SECURITY_TOKEN_HEAD])) {
             $queryParams[OBSConstants::SECURITY_TOKEN_HEAD] = $this->securityToken;
         }
 
@@ -397,7 +397,7 @@ trait SendRequestTrait
 
         $queryParams[OBSConstants::TEMPURL_AK_HEAD] = $this->ak;
 
-        if (!is_numeric($expires) || $expires < 0) {
+        if (! is_numeric($expires) || $expires < 0) {
             $expires = 300;
         }
         $expires = ((int) $expires) + ((int) microtime(true));
@@ -424,7 +424,7 @@ trait SendRequestTrait
 
         $model = new Model();
         $model->ActualSignedRequestHeaders = $headers;
-        $model->SignedUrl = strtolower($url['scheme']) . '://' . $host . (isset($url['port']) && !in_array((int) $url['port'], [443, 80]) ? ':' . $url['port'] : '') . $result;
+        $model->SignedUrl = strtolower($url['scheme']) . '://' . $host . (isset($url['port']) && ! in_array((int) $url['port'], [443, 80]) ? ':' . $url['port'] : '') . $result;
 
         return $model;
     }
@@ -432,16 +432,16 @@ trait SendRequestTrait
     private function checkMimeType(string $method, array &$params)
     {
         // fix bug that guzzlehttp lib will add the content-type if not set
-        if (($method === 'putObject' || $method === 'initiateMultipartUpload' || $method === 'uploadPart') && (!isset($params[ObsClient::OBS_CONTENT_TYPE]) || $params[ObsClient::OBS_CONTENT_TYPE] === null)) {
+        if (($method === 'putObject' || $method === 'initiateMultipartUpload' || $method === 'uploadPart') && (! isset($params[ObsClient::OBS_CONTENT_TYPE]) || $params[ObsClient::OBS_CONTENT_TYPE] === null)) {
             if (isset($params[ObsClient::OBS_KEY])) {
                 $params[ObsClient::OBS_CONTENT_TYPE] = Psr7\MimeType::fromFilename($params[ObsClient::OBS_KEY]);
             }
 
-            if ((!isset($params[ObsClient::OBS_CONTENT_TYPE]) || $params[ObsClient::OBS_CONTENT_TYPE] === null) && isset($params['SourceFile'])) {
+            if ((! isset($params[ObsClient::OBS_CONTENT_TYPE]) || $params[ObsClient::OBS_CONTENT_TYPE] === null) && isset($params['SourceFile'])) {
                 $params[ObsClient::OBS_CONTENT_TYPE] = Psr7\MimeType::fromFilename($params['SourceFile']);
             }
 
-            if (!isset($params[ObsClient::OBS_CONTENT_TYPE]) || $params[ObsClient::OBS_CONTENT_TYPE] === null) {
+            if (! isset($params[ObsClient::OBS_CONTENT_TYPE]) || $params[ObsClient::OBS_CONTENT_TYPE] === null) {
                 $params[ObsClient::OBS_CONTENT_TYPE] = 'binary/octet-stream';
             }
         }

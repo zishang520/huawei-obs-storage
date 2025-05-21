@@ -35,7 +35,7 @@ class PortableVisibilityConverter implements VisibilityConverter
     {
         return match ($acl) {
             'READ' => Visibility::PUBLIC,
-            default => Visibility::PRIVATE
+            default => Visibility::PRIVATE,
         };
     }
 

@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com>
-
+ * Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
-
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -140,7 +140,7 @@ class SdkCurlFactory implements CurlFactoryInterface
 
         $method = $easy->request->getMethod();
         if ($method === 'PUT' || $method === 'POST') {
-            if (!$easy->request->hasHeader('Content-Length')) {
+            if (! $easy->request->hasHeader('Content-Length')) {
                 $conf[CURLOPT_HTTPHEADER][] = 'Content-Length: 0';
             }
         } elseif ($method === 'HEAD') {
@@ -161,8 +161,8 @@ class SdkCurlFactory implements CurlFactoryInterface
             : $request->getBody()->getSize();
 
         if ($request->getBody()->getSize() === $size && $request->getBody()->tell() <= 0) {
-            if (($size !== null && $size < 1000000) ||
-                !empty($options['_body_as_string'])
+            if (($size !== null && $size < 1000000)
+                || ! empty($options['_body_as_string'])
             ) {
                 $conf[CURLOPT_POSTFIELDS] = (string) $request->getBody();
                 $this->removeHeader('Content-Length', $conf);
@@ -177,9 +177,7 @@ class SdkCurlFactory implements CurlFactoryInterface
                 if ($body->isSeekable()) {
                     $body->rewind();
                 }
-                $conf[CURLOPT_READFUNCTION] = function ($ch, $fd, $length) use ($body) {
-                    return $body->read($length);
-                };
+                $conf[CURLOPT_READFUNCTION] = fn($ch, $fd, $length) => $body->read($length);
             }
         } else {
             $body = $request->getBody();
@@ -197,11 +195,11 @@ class SdkCurlFactory implements CurlFactoryInterface
             };
         }
 
-        if (!$request->hasHeader('Expect')) {
+        if (! $request->hasHeader('Expect')) {
             $conf[CURLOPT_HTTPHEADER][] = 'Expect:';
         }
 
-        if (!$request->hasHeader('Content-Type')) {
+        if (! $request->hasHeader('Content-Type')) {
             $conf[CURLOPT_HTTPHEADER][] = 'Content-Type:';
         }
     }
@@ -215,7 +213,7 @@ class SdkCurlFactory implements CurlFactoryInterface
         }
 
         // Remove the Accept header if one was not set
-        if (!$easy->request->hasHeader('Accept')) {
+        if (! $easy->request->hasHeader('Accept')) {
             $conf[CURLOPT_HTTPHEADER][] = 'Accept:';
         }
     }
@@ -223,7 +221,7 @@ class SdkCurlFactory implements CurlFactoryInterface
     private function removeHeader(string $name, array &$options)
     {
         foreach (array_keys($options['_headers']) as $key) {
-            if (!strcasecmp($key, $name)) {
+            if (! strcasecmp($key, $name)) {
                 unset($options['_headers'][$key]);
                 return;
             }
@@ -241,11 +239,11 @@ class SdkCurlFactory implements CurlFactoryInterface
             } else {
                 $conf[CURLOPT_SSL_VERIFYPEER] = true;
                 if (is_string($options['verify'])) {
-                    if (!file_exists($options['verify'])) {
+                    if (! file_exists($options['verify'])) {
                         throw new \InvalidArgumentException("SSL CA bundle not found: {$options['verify']}");
                     }
-                    if (is_dir($options['verify']) ||
-                        (is_link($options['verify']) && is_dir(readlink($options['verify'])))) {
+                    if (is_dir($options['verify'])
+                        || (is_link($options['verify']) && is_dir(readlink($options['verify'])))) {
                         $conf[CURLOPT_CAPATH] = $options['verify'];
                     } else {
                         $conf[CURLOPT_CAINFO] = $options['verify'];
@@ -254,7 +252,7 @@ class SdkCurlFactory implements CurlFactoryInterface
             }
         }
 
-        if (!empty($options['decode_content'])) {
+        if (! empty($options['decode_content'])) {
             $accept = $easy->request->getHeaderLine('Accept-Encoding');
             if ($accept) {
                 $conf[CURLOPT_ENCODING] = $accept;
@@ -266,17 +264,15 @@ class SdkCurlFactory implements CurlFactoryInterface
 
         if (isset($options['sink'])) {
             $sink = $options['sink'];
-            if (!is_string($sink)) {
+            if (! is_string($sink)) {
                 $sink = Psr7\Utils::streamFor($sink);
-            } elseif (!is_dir(dirname($sink))) {
+            } elseif (! is_dir(dirname($sink))) {
                 throw new \RuntimeException(sprintf('Directory %s does not exist for sink value of %s', dirname($sink), $sink));
             } else {
                 $sink = new LazyOpenStream($sink, 'w+');
             }
             $easy->sink = $sink;
-            $conf[CURLOPT_WRITEFUNCTION] = function ($ch, $write) use ($sink) {
-                return $sink->write($write);
-            };
+            $conf[CURLOPT_WRITEFUNCTION] = fn($ch, $write) => $sink->write($write);
         } else {
             $conf[CURLOPT_FILE] = fopen('php://temp', 'w+');
             $easy->sink = Psr7\Utils::streamFor($conf[CURLOPT_FILE]);
@@ -305,14 +301,14 @@ class SdkCurlFactory implements CurlFactoryInterface
         }
 
         if (isset($options['proxy'])) {
-            if (!is_array($options['proxy'])) {
+            if (! is_array($options['proxy'])) {
                 $conf[CURLOPT_PROXY] = $options['proxy'];
             } else {
                 $scheme = $easy->request->getUri()->getScheme();
                 if (isset($options['proxy'][$scheme])) {
                     $host = $easy->request->getUri()->getHost();
-                    if (!isset($options['proxy']['no']) ||
-                        !\GuzzleHttp\Utils::isHostInNoProxy($host, $options['proxy']['no'])
+                    if (! isset($options['proxy']['no'])
+                        || ! \GuzzleHttp\Utils::isHostInNoProxy($host, $options['proxy']['no'])
                     ) {
                         $conf[CURLOPT_PROXY] = $options['proxy'][$scheme];
                     }
@@ -326,7 +322,7 @@ class SdkCurlFactory implements CurlFactoryInterface
                 $conf[CURLOPT_SSLCERTPASSWD] = $cert[1];
                 $cert = $cert[0];
             }
-            if (!file_exists($cert)) {
+            if (! file_exists($cert)) {
                 throw new \InvalidArgumentException("SSL certificate not found: {$cert}");
             }
             $conf[CURLOPT_SSLCERT] = $cert;
@@ -338,7 +334,7 @@ class SdkCurlFactory implements CurlFactoryInterface
                 $conf[CURLOPT_SSLKEYPASSWD] = $sslKey[1];
                 $sslKey = $sslKey[0];
             }
-            if (!file_exists($sslKey)) {
+            if (! file_exists($sslKey)) {
                 throw new \InvalidArgumentException("SSL private key not found: {$sslKey}");
             }
             $conf[CURLOPT_SSLKEY] = $sslKey;
@@ -346,7 +342,7 @@ class SdkCurlFactory implements CurlFactoryInterface
 
         if (isset($options['progress'])) {
             $progress = $options['progress'];
-            if (!is_callable($progress)) {
+            if (! is_callable($progress)) {
                 throw new \InvalidArgumentException('progress client option must be callable');
             }
             $conf[CURLOPT_NOPROGRESS] = false;
@@ -359,7 +355,7 @@ class SdkCurlFactory implements CurlFactoryInterface
             };
         }
 
-        if (!empty($options['debug'])) {
+        if (! empty($options['debug'])) {
             $conf[CURLOPT_STDERR] = \GuzzleHttp\Utils::debugResource($options['debug']);
             $conf[CURLOPT_VERBOSE] = true;
         }
@@ -370,7 +366,7 @@ class SdkCurlFactory implements CurlFactoryInterface
         if (isset($easy->options['on_headers'])) {
             $onHeaders = $easy->options['on_headers'];
 
-            if (!is_callable($onHeaders)) {
+            if (! is_callable($onHeaders)) {
                 throw new \InvalidArgumentException('on_headers must be callable');
             }
         } else {

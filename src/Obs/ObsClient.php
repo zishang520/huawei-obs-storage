@@ -463,7 +463,7 @@ class ObsClient
             $handler = $handler
                 ? Proxy::wrapStreaming($handler, new SdkStreamHandler())
                 : new SdkStreamHandler();
-        } elseif (!$handler) {
+        } elseif (! $handler) {
             throw new \RuntimeException('GuzzleHttp requires cURL, the allow_url_fopen ini setting, or a custom HTTP handler.');
         }
 

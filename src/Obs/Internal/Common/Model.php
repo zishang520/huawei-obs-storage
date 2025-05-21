@@ -86,7 +86,7 @@ class Model implements \Stringable, \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @return array Returns an array of all matching key value pairs
      */
-    public function getAll(array $keys = null): array
+    public function getAll(?array $keys = null): array
     {
         return $keys ? array_intersect_key($this->data, array_flip($keys)) : $this->data;
     }
@@ -129,7 +129,7 @@ class Model implements \Stringable, \ArrayAccess, \IteratorAggregate, \Countable
      */
     public function add(string $key, mixed $value): static|self
     {
-        if (!array_key_exists($key, $this->data)) {
+        if (! array_key_exists($key, $this->data)) {
             $this->data[$key] = $value;
         } elseif (is_array($this->data[$key])) {
             $this->data[$key][] = $value;
@@ -182,7 +182,7 @@ class Model implements \Stringable, \ArrayAccess, \IteratorAggregate, \Countable
     public function keySearch(string $key): bool|string
     {
         foreach (array_keys($this->data) as $k) {
-            if (!strcasecmp($k, $key)) {
+            if (! strcasecmp($k, $key)) {
                 return $k;
             }
         }
@@ -323,7 +323,7 @@ class Model implements \Stringable, \ArrayAccess, \IteratorAggregate, \Countable
         $queueSize = count($queue);
 
         foreach ($queue as $index => $key) {
-            if (!is_array($current)) {
+            if (! is_array($current)) {
                 throw new \RuntimeException("Trying to setPath {$path}, but {$key} is set and is not an array");
             } elseif ($index === $queueSize - 1) {
                 $current[$key] = $value;
@@ -356,7 +356,7 @@ class Model implements \Stringable, \ArrayAccess, \IteratorAggregate, \Countable
         $path = is_array($path) ? $path : explode($separator, $path);
 
         foreach ($path as $part) {
-            if (!is_array($data)) {
+            if (! is_array($data)) {
                 return null;
             } elseif (isset($data[$part])) {
                 $data = &$data[$part];
@@ -366,7 +366,7 @@ class Model implements \Stringable, \ArrayAccess, \IteratorAggregate, \Countable
                 // Perform a wildcard search by diverging and merging paths
                 $result = [];
                 foreach ($data as $value) {
-                    if (!$path) {
+                    if (! $path) {
                         $result = array_merge_recursive($result, (array) $value);
                     } elseif (null !== ($test = $this->getPath($path, $separator, $value))) {
                         $result = array_merge_recursive($result, (array) $test);

@@ -64,7 +64,7 @@ trait GetResponseTrait
                 }
 
                 $array = [];
-                if (!isset($value['data']['xmlFlattened'])) {
+                if (! isset($value['data']['xmlFlattened'])) {
                     $pkey = isset($items['sentAs']) ? $items['sentAs'] : $items['name'];
                     $_searchPath = $searchPath . '/' . $prefix . $pkey;
                 } else {
@@ -152,11 +152,11 @@ trait GetResponseTrait
                                 }
                             }
                         }
-                        if (!$isSet) {
+                        if (! $isSet) {
                             $model[$key] = rawurldecode($response->getHeaderLine($name));
                         }
                     } elseif ($location === 'xml' && $body !== null) {
-                        if (!isset($xml) && ($xml = simplexml_load_string($body->getContents()))) {
+                        if (! isset($xml) && ($xml = simplexml_load_string($body->getContents()))) {
                             $prefix = $this->getXpathPrefix($xml);
                         }
                         $closeBody = true;
@@ -217,7 +217,7 @@ trait GetResponseTrait
                 }
             }
         } else {
-            if (!empty($model)) {
+            if (! empty($model)) {
                 foreach ($model as $key => $value) {
                     if ($key === 'method') {
                         continue;
@@ -317,12 +317,12 @@ trait GetResponseTrait
             $fp = null;
             $dir = dirname($filePath);
             try {
-                if (!is_dir($dir)) {
+                if (! is_dir($dir)) {
                     mkdir($dir, 0755, true);
                 }
 
                 if ($fp = fopen($filePath, 'w')) {
-                    while (!$body->eof()) {
+                    while (! $body->eof()) {
                         $str = $body->read($this->chunkSize);
                         fwrite($fp, $str);
                     }

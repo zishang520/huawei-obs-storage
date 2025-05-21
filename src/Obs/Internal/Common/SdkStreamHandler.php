@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com>
-
+ * Copyright (c) 2011-2018 Michael Dowling, https://github.com/mtdowling <mtdowling@gmail.com>.
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
-
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
-
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -81,8 +81,8 @@ class SdkStreamHandler
         array $options,
         RequestInterface $request,
         $startTime,
-        ResponseInterface $response = null,
-        $error = null
+        ?ResponseInterface $response = null,
+        $error = null,
     ) {
         if (isset($options['on_stats'])) {
             $stats = new TransferStats(
@@ -100,7 +100,7 @@ class SdkStreamHandler
         RequestInterface $request,
         array $options,
         $stream,
-        $startTime
+        $startTime,
     ) {
         $hdrs = $this->lastHeaders;
         $this->lastHeaders = [];
@@ -144,7 +144,7 @@ class SdkStreamHandler
 
     private function createSink(StreamInterface $stream, array $options)
     {
-        if (!empty($options['stream'])) {
+        if (! empty($options['stream'])) {
             return $stream;
         }
 
@@ -161,7 +161,7 @@ class SdkStreamHandler
 
     private function checkDecode(array $options, array $headers, $stream)
     {
-        if (!empty($options['decode_content'])) {
+        if (! empty($options['decode_content'])) {
             $normalizedKeys = \GuzzleHttp\Utils::normalizeHeaderKeys($headers);
             if (isset($normalizedKeys['content-encoding'])) {
                 $encoding = $headers[$normalizedKeys['content-encoding']];
@@ -194,7 +194,7 @@ class SdkStreamHandler
     private function drain(
         StreamInterface $source,
         StreamInterface $sink,
-        $contentLength
+        $contentLength,
     ) {
         Psr7\Utils::copyToStream(
             $source,
@@ -223,7 +223,7 @@ class SdkStreamHandler
         $resource = $callback();
         restore_error_handler();
 
-        if (!$resource) {
+        if (! $resource) {
             $message = 'Error creating resource: ';
             foreach ($errors as $err) {
                 foreach ($err as $key => $value) {
@@ -243,23 +243,23 @@ class SdkStreamHandler
         }
 
         if ($request->getProtocolVersion() == '1.1'
-            && !$request->hasHeader('Connection')
+            && ! $request->hasHeader('Connection')
         ) {
             $request = $request->withHeader('Connection', 'close');
         }
 
-        if (!isset($options['verify'])) {
+        if (! isset($options['verify'])) {
             $options['verify'] = true;
         }
 
         $params = [];
         $context = $this->getDefaultContext($request, $options);
 
-        if (isset($options['on_headers']) && !is_callable($options['on_headers'])) {
+        if (isset($options['on_headers']) && ! is_callable($options['on_headers'])) {
             throw new \InvalidArgumentException('on_headers must be callable');
         }
 
-        if (!empty($options)) {
+        if (! empty($options)) {
             foreach ($options as $key => $value) {
                 $method = "add_{$key}";
                 if (isset(self::$methods[$method])) {
@@ -269,7 +269,7 @@ class SdkStreamHandler
         }
 
         if (isset($options['stream_context'])) {
-            if (!is_array($options['stream_context'])) {
+            if (! is_array($options['stream_context'])) {
                 throw new \InvalidArgumentException('stream_context must be an array');
             }
             $context = array_replace_recursive(
@@ -289,9 +289,7 @@ class SdkStreamHandler
         $uri = $this->resolveHost($request, $options);
 
         $context = $this->createResource(
-            function () use ($context, $params) {
-                return stream_context_create($context, $params);
-            }
+            fn() => stream_context_create($context, $params)
         );
 
         return $this->createResource(
@@ -315,16 +313,16 @@ class SdkStreamHandler
     {
         $uri = $request->getUri();
 
-        if (isset($options['force_ip_resolve']) && !filter_var($uri->getHost(), FILTER_VALIDATE_IP)) {
+        if (isset($options['force_ip_resolve']) && ! filter_var($uri->getHost(), FILTER_VALIDATE_IP)) {
             if ($options['force_ip_resolve'] === 'v4') {
                 $records = dns_get_record($uri->getHost(), DNS_A);
-                if (!isset($records[0]['ip'])) {
+                if (! isset($records[0]['ip'])) {
                     throw new ConnectException(sprintf("Could not resolve IPv4 address for host '%s'", $uri->getHost()), $request);
                 }
                 $uri = $uri->withHost($records[0]['ip']);
             } elseif ($options['force_ip_resolve'] === 'v6') {
                 $records = dns_get_record($uri->getHost(), DNS_AAAA);
-                if (!isset($records[0]['ipv6'])) {
+                if (! isset($records[0]['ipv6'])) {
                     throw new ConnectException(sprintf("Could not resolve IPv6 address for host '%s'", $uri->getHost()), $request);
                 }
                 $uri = $uri->withHost('[' . $records[0]['ipv6'] . ']');
@@ -355,9 +353,9 @@ class SdkStreamHandler
 
         $body = (string) $request->getBody();
 
-        if (!empty($body)) {
+        if (! empty($body)) {
             $context['http']['content'] = $body;
-            if (!$request->hasHeader('Content-Type')) {
+            if (! $request->hasHeader('Content-Type')) {
                 $context['http']['header'] .= "Content-Type:\r\n";
             }
         }

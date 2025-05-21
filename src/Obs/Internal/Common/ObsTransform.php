@@ -32,8 +32,8 @@ class ObsTransform implements ITransform
     private function transAclHeader(string $para): ?string
     {
         if (
-            $para === ObsClient::AclAuthenticatedRead || $para === ObsClient::AclBucketOwnerRead ||
-            $para === ObsClient::AclBucketOwnerFullControl || $para === ObsClient::AclLogDeliveryWrite
+            $para === ObsClient::AclAuthenticatedRead || $para === ObsClient::AclBucketOwnerRead
+            || $para === ObsClient::AclBucketOwnerFullControl || $para === ObsClient::AclLogDeliveryWrite
         ) {
             $para = null;
         }

@@ -39,7 +39,7 @@ class ObsException extends \RuntimeException
 
     private string $hostId = '';
 
-    public function __construct(string $message = null, int $code = null, \Throwable $previous = null)
+    public function __construct(?string $message = null, ?int $code = null, ?\Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

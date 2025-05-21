@@ -65,11 +65,11 @@ class DefaultSignature extends AbstractSignature
             $interestHeaders['date'] = (string) $expires;
         }
 
-        if (!array_key_exists('content-type', $interestHeaders)) {
+        if (! array_key_exists('content-type', $interestHeaders)) {
             $interestHeaders['content-type'] = '';
         }
 
-        if (!array_key_exists('content-md5', $interestHeaders)) {
+        if (! array_key_exists('content-md5', $interestHeaders)) {
             $interestHeaders['content-md5'] = '';
         }
 
@@ -91,13 +91,13 @@ class DefaultSignature extends AbstractSignature
         if ($bucketName) {
             $uri .= '/';
             $uri .= $bucketName;
-            if (!$this->pathStyle) {
+            if (! $this->pathStyle) {
                 $uri .= '/';
             }
         }
 
         if ($objectKey) {
-            if (!($pos = strripos($uri, '/')) || strlen($uri) - 1 !== $pos) {
+            if (! ($pos = strripos($uri, '/')) || strlen($uri) - 1 !== $pos) {
                 $uri .= '/';
             }
             $uri .= $objectKey;
@@ -105,7 +105,7 @@ class DefaultSignature extends AbstractSignature
 
         $buffer[] = $uri === '' ? '/' : $uri;
 
-        if (!empty($pathArgs)) {
+        if (! empty($pathArgs)) {
             ksort($pathArgs);
             $_pathArgs = [];
             foreach ($pathArgs as $key => $value) {
@@ -113,7 +113,7 @@ class DefaultSignature extends AbstractSignature
                     $_pathArgs[] = $value === null || $value === '' ? $key : $key . '=' . urldecode($value);
                 }
             }
-            if (!empty($_pathArgs)) {
+            if (! empty($_pathArgs)) {
                 $buffer[] = '?';
                 $buffer[] = implode('&', $_pathArgs);
             }
