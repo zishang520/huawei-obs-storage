@@ -27,6 +27,7 @@ Add the following in `app/filesystems.php`:
             'driver' => 'obs',
             'access_id' => env('OBS_ACCESS_KEY_ID'),
             'access_key' => env('OBS_ACCESS_KEY_SECRET'),
+            'security_token' => env('OBS_ACCESS_SESSION_KEY'), // required for temporary access credentials
             'bucket' => env('OBS_BUCKET'),
             'endpoint' => env('OBS_ENDPOINT'), // OBS 外网节点或自定义外部域名
             'endpoint_internal' => env('OBS_ENDPOINT_INTERNAL'), // 如果为空，则默认使用 endpoint 配置
