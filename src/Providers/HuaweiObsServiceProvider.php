@@ -30,6 +30,7 @@ class HuaweiObsServiceProvider extends ServiceProvider
             $client = new ObsClient([
                 'key' => $config['access_id'],
                 'secret' => $config['access_key'],
+                'security_token' => $config['security_token'] ?? null,
                 'proxy' => $config['proxy'] ?? null,
                 'endpoint' => $epInternal,
                 'ssl_verify' => $ssl,
