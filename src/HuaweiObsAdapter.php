@@ -129,13 +129,6 @@ class HuaweiObsAdapter implements FilesystemAdapter
             return ((int) $objectMetadata->HttpStatusCode) === 200;
         } catch (ObsException $exception) {
             $status = (int) $exception->getResponse()->getStatusCode();
-
-            // If the status code is 403 or 401, we throw the main exception
-            // as it indicates a permission/access issue, not a file existence issue.
-            if($status === 403 || $status === 401) {
-                throw $exception;
-            }
-            
             if (((int) $status / 100) == 2 || $status === 404) {
                 return $status === 200;
             }
